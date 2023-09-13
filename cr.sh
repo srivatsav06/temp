@@ -1,15 +1,32 @@
 #!/bin/bash
 
-# Function to generate a branch name based on the pull request number
 generate_branch_name() {
-  local PR_NUMBER=$(gh pr list --state open --limit 1 --json number --jq '.[0].number')
-  if [ -n "$PR_NUMBER" ]; then
-    printf "cr%05d" "$PR_NUMBER"
+  local LATEST_PR=$(gh pr list --state open --limit 1 --json number --jq '.[0].number')
+  if [ -n "$LATEST_PR" ]; then
+    printf "cr%05d" "$LATEST_PR"
   else
-    echo "Unable to retrieve the pull request number."
-    exit 1
+    # If no open pull requests, get the highest closed pull request number
+    local HIGHEST_CLOSED_PR=$(gh pr list --state closed --limit 1 --json number --jq '.[0].number')
+    if [ -n "$HIGHEST_CLOSED_PR" ]; then
+      printf "cr%05d" "$HIGHEST_CLOSED_PR"
+    else
+      # If no closed pull requests either, start from 1
+      local NEW_PR= 1
+      printf "cr%05d" "$NEW_PR"
+    fi
   fi
 }
+
+## Function to generate a branch name based on the pull request number
+#generate_branch_name() {
+#  local PR_NUMBER=$(gh pr list --state open --limit 1 --json number --jq '.[0].number')
+#  if [ -n "$PR_NUMBER" ]; then
+#    printf "cr%05d" "$PR_NUMBER"
+#  else
+#    echo "Unable to retrieve the pull request number."
+#    exit 1
+#  fi
+#}
 
 # Replace these variables with your own values
 BASE_BRANCH="main"
