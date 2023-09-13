@@ -12,6 +12,15 @@ create_or_checkout_branch() {
   git checkout "$BRANCH_NAME" 2>/dev/null || git checkout -b "$BRANCH_NAME"
 }
 
+# Function to push to an existing branch, resolving conflicts with local code
+push_to_existing_branch() {
+  local BRANCH_NAME="$1"
+  git checkout "$BRANCH_NAME"
+  git branch --set-upstream-to=origin/"$BRANCH_NAME" "$BRANCH_NAME"
+  git pull origin "$BRANCH_NAME"
+  git push "$REMOTE_NAME" "$BRANCH_NAME" --strategy-option=theirs
+}
+
 # Function to check if a branch exists either locally or remotely
 branch_exists() {
   local BRANCH_NAME="$1"
@@ -22,6 +31,8 @@ branch_exists() {
     echo "false"
   fi
 }
+
+
 
 # Function to generate a random branch name
 generate_random_branch_name() {
