@@ -23,6 +23,14 @@ branch_exists() {
   fi
 }
 
+# Function to push to an existing branch, resolving conflicts with local code
+push_to_existing_branch() {
+  local BRANCH_NAME="$1"
+  git checkout "$BRANCH_NAME"
+  git pull origin "$BRANCH_NAME"
+  git push "$REMOTE_NAME" "$BRANCH_NAME" --strategy-option=theirs
+}
+
 # Function to generate a random branch name
 generate_random_branch_name() {
   while true; do
